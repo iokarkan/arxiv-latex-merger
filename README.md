@@ -26,7 +26,7 @@ To use the arXiv LaTeX Merger, simply run the command `arxiv-latex-merger` follo
 arxiv-latex-merger 2304.09319 1812.09740 [...]
 ```
 
-This will download the source files, detect the main TeX file, merge the contents, and save the merged TeX file as `2304.09319_merged.tex`.
+This will download the source files for all selected codes, detect the main TeX file, merge the contents, and save the merged TeX files as `2304.09319_merged.tex` and `1812.09740_merged.tex`.
 
 ## License
 
