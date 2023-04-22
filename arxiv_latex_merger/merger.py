@@ -16,6 +16,12 @@ def find_main_tex_file(directory):
                     for line in tex_file:
                         if documentclass_pattern.search(line):
                             return file_path
+            # special case for some old submissions, they are already merged
+            if len(files)==1:
+                print(f"Detected single file for {directory}, please verify that this is correct...")
+                file_path = os.path.join(root, file)
+                return file_path
+
 
     raise FileNotFoundError(f"No main .tex file found in the specified directory {directory}")
 
