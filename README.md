@@ -23,10 +23,16 @@ pip install arxiv-latex-merger
 To use the arXiv LaTeX Merger, simply run the command `arxiv-latex-merger` followed by the arXiv code of the paper you want to merge:
 
 ```
-arxiv-latex-merger 2304.09319 1812.09740 [...]
+arxiv-latex-merger --arxiv_codes 2304.09319 1812.09740 [...]
 ```
 
 This will download the source files for all selected codes, detect the main TeX file, merge the contents, and save the merged TeX files as `2304.09319_merged.tex` and `1812.09740_merged.tex`.
+
+Or try this to download randomly:
+
+```
+arxiv-latex-merger --n_random 2
+```
 
 ## License
 
