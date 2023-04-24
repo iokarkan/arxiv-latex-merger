@@ -36,6 +36,8 @@ def main(arxiv_codes, n_random=None, demacro=False):
 
         with open(f"{code}_merged.tex", 'w') as output_file:
             output_file.write(merged_tex_content)
+        
+        print(f'Merged .tex file saved to {output_tex_path}')
 
         if demacro:
             print(f"WARNING: Using experimental 'demacro' processing...")
@@ -46,8 +48,9 @@ def main(arxiv_codes, n_random=None, demacro=False):
 
             with open(f"{code}_merged_clean.tex", "w") as output_file:
                 output_file.write(merged_clean)
+            
+            print(f"Demacro'd & merged .tex file saved to {output_tex_path}")
 
-        print(f'Merged .tex file saved to {output_tex_path}')
 
 
 def cli():
