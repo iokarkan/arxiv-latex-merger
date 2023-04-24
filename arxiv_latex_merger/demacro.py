@@ -78,7 +78,7 @@ class LatexDemacro:
 
         # look for def command
         # TODO: generalize the pattern for more symbols?
-        def_pattern = re.compile(r'\\def\s*\\([a-zA-Z\:\#\w]*|@?[a-zA-Z\:\#]*@?)?\s*')
+        def_pattern = re.compile(r'\\def\s*\\([a-zA-Z\:\#\]\[\']*|@?[a-zA-Z\:\#\]\[\']*@?)?\s*')
         defs = def_pattern.finditer(self.tmp)
         num_args = None
         for match in defs:
