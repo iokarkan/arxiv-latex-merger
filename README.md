@@ -34,6 +34,20 @@ Or try this to download randomly:
 arxiv-latex-merger --n_random 2
 ```
 
+### De-macro (🚧)
+
+The motivation to include this tool is to be able to get clean source files that are 
+free from custom definitions. As I could not find a working de-macro tool, I have put together some functionality to 
+attempt to de-macro common commands found in papers. There are some caveats, and there 
+will most likely be exceptions raised in the processing of files, but sometimes it is 
+successful in de-macroing all macros found in papers.
+
+You can attempt to de-macro the merged file using the `--demacro` option.
+
+```
+arxiv-latex-merger --demacro
+```
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more information.
