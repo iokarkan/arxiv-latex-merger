@@ -41,4 +41,6 @@ if __name__ == "__main__":
     assert defcommand("\mathbb C", 2, []) == "\mathbb C"
     assert defcommand("\mathbb C", 2, []) == "\mathbb C"
     assert defcommand("\mathbb #1", 2, ["C"]) == "\mathbb C"
+    
+    assert defcommand("\\psx #1 \\psy #2", 2, ["a", "b"]) == "\\psx a \\psy b"
 

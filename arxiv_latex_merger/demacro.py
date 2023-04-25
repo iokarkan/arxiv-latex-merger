@@ -26,7 +26,7 @@ import os
 
 class LatexDemacro:
 
-    def __init__(self, inp, out="./output/output.tex"):
+    def __init__(self, inp, out="./demacro-output.tex"):
         self.fname = inp
         self.inp = LatexDemacro.open_file(inp)
         self.out = out
@@ -53,8 +53,6 @@ class LatexDemacro:
 
 
     def save_file(self):
-        if not os.path.exists(self.out):
-            os.mkdir(self.out)
         with open(self.out, 'w') as file:
             file.write(self.tmp)
 
@@ -78,7 +76,7 @@ class LatexDemacro:
 
         # look for def command
         # TODO: generalize the pattern for more symbols?
-        def_pattern = re.compile(r'\\def\s*\\([a-zA-Z\:\#\]\[\']*|@?[a-zA-Z\:\#\]\[\']*@?)?\s*')
+        def_pattern = re.compile(r'\\def\s*\\([a-zA-Z\:\#\']*|@?[a-zA-Z\:\#\']*@?)?\s*')
         defs = def_pattern.finditer(self.tmp)
         num_args = None
         for match in defs:
@@ -191,15 +189,17 @@ class LatexDemacro:
                     start = match.end()
                     end = find_matching_bracket(self.tmp, start, bra="(")
                     if end != -1:
-                        default = self.tmp[start + 1:end]
-                        occurence = occurence + "[" + default + "]"
+                        for arg in self.tmp[start + 1:end].split(","):
+                            args.append(arg.strip())
+                        occurence = occurence + "(" + self.tmp[start + 1:end] + ")"
                     
                     # look for 2nd arg
                     start = end + 1
-                    end = find_matching_bracket(self.tmp, start, bra="{")
+                    end = find_matching_bracket(self.tmp, start, bra="[")
                     if end != -1:
-                        args.append(self.tmp[start + 1:end])
-                        occurence = occurence + "{" + args[-1] + "}"
+                        for arg in self.tmp[start + 1:end].split(","):
+                            args.append(arg.strip())
+                        occurence = occurence + "[" + self.tmp[start + 1:end] + "]"
                 
                 try:
                     self.def_transformations[occurence] = defcommand(self.def_declarations[macro]['definition'],
@@ -217,6 +217,7 @@ class LatexDemacro:
 
     def parse_for_newcommand_occurences(self):
         for macro in self.newcommand_declarations.keys():
+            # print(macro)
             # TODO: work-around needed here? for definitions of symbol characters?
             macro_pattern = re.compile(rf'\\{macro}\b')
             macro_occurences = macro_pattern.finditer(self.tmp)
@@ -364,7 +365,7 @@ class LatexDemacro:
 
 
     def process(self):
-        print(f"Starting to de-macro {self.fname}...")
+        # print(f"Starting to de-macro {self.fname}...")
         self.remove_comments()
 
         self.parse_def_declarations()
@@ -379,13 +380,13 @@ class LatexDemacro:
         # print(json.dumps(self.newcommand_declarations, indent=2))
         self.transform_newcommand_occurences()
 
-        print(f"Caught {self.num_exceptions} exceptions while de-macroing...")
+        # print(f"Caught {self.num_exceptions} exceptions while de-macroing...")
 
         return self.tmp
 
 
 if __name__=="__main__":
-    c = LatexDemacro("./input/input.tex")
+    c = LatexDemacro("./demacro-input.tex")
     c.process()
     c.save_file()
-    # print(c.tmp)
+    print(c.tmp)
