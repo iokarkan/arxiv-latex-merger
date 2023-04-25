@@ -13,6 +13,22 @@ class DemacroTDD(unittest.TestCase):
     def tearDownClass(cls):
         os.remove(cls.sample_input)
 
+    def test_def_nobracket_args(self):
+        with open(self.sample_input, 'w') as file:
+            file.write(
+r"""
+\def \test [#1]{testing #1}
+\test\alpha
+""")
+        content = LatexDemacro(self.sample_input).process()
+        self.assertEqual(content,
+r"""
+
+testing \alpha
+""", msg="Fails when no brackets are used, as in this example of single-arg macro.")
+
+    ###################################################################################
+
     def test_def_space_after_numargs(self):
         with open(self.sample_input, 'w') as file:
             file.write(
