@@ -2,26 +2,33 @@ import os
 import re
 
 def read_tex_file(file_path):
-    with open(file_path, 'r') as file:
-        return file.readlines()
+    try:
+        with open(file_path, 'r') as file:
+            return file.readlines()
+    except Exception as e:
+        try:
+            print(f"\tWARNING: {e} occured, trying latin-1 encoding...")
+            with open(file_path, 'r', encoding='latin-1') as file:
+                return file.readlines()
+        except Exception as e:
+            raise Exception(e)
 
 def find_main_tex_file(directory):
     documentclass_pattern = re.compile(r'\\documentclass')
 
     for root, _, files in os.walk(directory):
+        # special case for some old submissions, they are already merged
+        if len(files)==1:
+            print(f"Detected single file for {directory}, please verify that this is correct...")
+            file_path = os.path.join(root, files[0])
+            return file_path
+        
         for file in files:
             if file.endswith('.tex'):
-                file_path = os.path.join(root, file)
                 with open(file_path, 'r') as tex_file:
                     for line in tex_file:
                         if documentclass_pattern.search(line):
                             return file_path
-            # special case for some old submissions, they are already merged
-            if len(files)==1:
-                print(f"Detected single file for {directory}, please verify that this is correct...")
-                file_path = os.path.join(root, file)
-                return file_path
-
 
     raise FileNotFoundError(f"No main .tex file found in the specified directory {directory}")
 
