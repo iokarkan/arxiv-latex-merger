@@ -3,29 +3,21 @@ import re
 import shutil
 from pathlib import Path
 
-def read_tex_file(file_path, accept_latin1=False):
+def read_tex_file(file_path):
     try:
-        with open(file_path, 'r') as file:
-            return file.readlines()
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.readlines(), 'utf-8'
     except Exception as e:
-        if accept_latin1:
-            try:
-                print(f"\tWARNING: {e} occured, trying latin-1 encoding...")
-                with open(file_path, 'r', encoding='latin-1') as file:
-                    return file.readlines()
-            except Exception as e:
-                raise Exception(e)
-        else:
-            print(f"Possible non utf-8 detected, Creating dummy merged file...")
-            return "DUMMY MERGED FILE: SOMETHING WENT WRONG. CHECK ENCODING OF MAIN TEX FILE."
-        
+        # assuming that non-utf-8 files that can be processed here are latin-1
+        # no other cases found yet
+        with open(file_path, 'r', encoding='latin-1') as file:
+            return file.readlines(), 'latin-1'
 
 def find_main_tex_file(directory):
     documentclass_pattern = re.compile(r'\\documentclass')
 
     for root, _, files in os.walk(directory):
         # special case for some old submissions, they are already merged
-        
         if len(files)==1:
             print(f"Detected single file for {directory}, please verify that this is correct...")
             file_path = os.path.join(root, files[0])
@@ -34,10 +26,10 @@ def find_main_tex_file(directory):
         for file in files:
             file_path = os.path.join(root, file)
             if file.endswith('.tex'):
-                with open(file_path, 'r') as tex_file:
-                    for line in tex_file:
-                        if documentclass_pattern.search(line):
-                            return file_path
+                tex_file, _ = read_tex_file(file_path)
+                for line in tex_file:
+                    if documentclass_pattern.search(line):
+                        return file_path
 
     raise FileNotFoundError(f"No main .tex file found in the specified directory {directory}")
 
@@ -60,7 +52,7 @@ def process_input_commands(file_lines, file_dir):
                         input_file_path += '.tex'
 
                 input_file_dir = os.path.dirname(input_file_path)
-                input_file_lines = read_tex_file(input_file_path)
+                input_file_lines, _ = read_tex_file(input_file_path)
 
                 input_file_content = process_input_commands(input_file_lines, input_file_dir)
 
@@ -70,12 +62,13 @@ def process_input_commands(file_lines, file_dir):
 
     return output_lines
 
-def merge_tex_files(main_tex_path, remove_src=False, accept_latin1=False):
-    main_tex_dir = os.path.dirname(main_tex_path)
-    main_tex_lines = read_tex_file(main_tex_path, accept_latin1=accept_latin1)
-    merged_tex_lines = process_input_commands(main_tex_lines, main_tex_dir)
+def merge_tex_files(main_tex_path, remove_src=False):
     
+    main_tex_dir = os.path.dirname(main_tex_path)
+    main_tex_lines, encoding = read_tex_file(main_tex_path)
+    merged_tex_lines = process_input_commands(main_tex_lines, main_tex_dir)
+        
     if remove_src:
         shutil.rmtree(Path(f"./{main_tex_dir}"))
 
-    return ''.join(merged_tex_lines)
+    return ''.join(merged_tex_lines), encoding
