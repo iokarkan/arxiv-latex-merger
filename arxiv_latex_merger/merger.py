@@ -18,12 +18,14 @@ def find_main_tex_file(directory):
 
     for root, _, files in os.walk(directory):
         # special case for some old submissions, they are already merged
+        
         if len(files)==1:
             print(f"Detected single file for {directory}, please verify that this is correct...")
             file_path = os.path.join(root, files[0])
             return file_path
         
         for file in files:
+            file_path = os.path.join(root, file)
             if file.endswith('.tex'):
                 with open(file_path, 'r') as tex_file:
                     for line in tex_file:
