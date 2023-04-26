@@ -56,8 +56,10 @@ def download_random_arxiv_papers(n=1):
             if is_valid_arxiv_id(random_arxiv_id):
                 return random_arxiv_id
 
-    random_papers = arxiv.Search(id_list=[find_valid_arxiv_id() for i in range(int(n))],
-                                max_results=5,
+    random_papers = arxiv.Search(id_list=[find_valid_arxiv_id() for _ in tqdm(range(int(n)), 
+                                                                              desc=f"Generating {n} random arXiv codes...", 
+                                                                              unit="code")],
+                                max_results=n,
                                 sort_by = arxiv.SortCriterion.SubmittedDate)
     arxiv_codes = []
     for paper in random_papers.results():
