@@ -1,17 +1,24 @@
 import os
 import re
+import shutil
+from pathlib import Path
 
-def read_tex_file(file_path):
+def read_tex_file(file_path, accept_latin1=False):
     try:
         with open(file_path, 'r') as file:
             return file.readlines()
     except Exception as e:
-        try:
-            print(f"\tWARNING: {e} occured, trying latin-1 encoding...")
-            with open(file_path, 'r', encoding='latin-1') as file:
-                return file.readlines()
-        except Exception as e:
-            raise Exception(e)
+        if accept_latin1:
+            try:
+                print(f"\tWARNING: {e} occured, trying latin-1 encoding...")
+                with open(file_path, 'r', encoding='latin-1') as file:
+                    return file.readlines()
+            except Exception as e:
+                raise Exception(e)
+        else:
+            print(f"Possible non utf-8 detected, Creating dummy merged file...")
+            return "DUMMY MERGED FILE: SOMETHING WENT WRONG. CHECK ENCODING OF MAIN TEX FILE."
+        
 
 def find_main_tex_file(directory):
     documentclass_pattern = re.compile(r'\\documentclass')
@@ -63,10 +70,12 @@ def process_input_commands(file_lines, file_dir):
 
     return output_lines
 
-def merge_tex_files(main_tex_path):
+def merge_tex_files(main_tex_path, remove_src=False, accept_latin1=False):
     main_tex_dir = os.path.dirname(main_tex_path)
-    main_tex_lines = read_tex_file(main_tex_path)
-
+    main_tex_lines = read_tex_file(main_tex_path, accept_latin1=accept_latin1)
     merged_tex_lines = process_input_commands(main_tex_lines, main_tex_dir)
+    
+    if remove_src:
+        shutil.rmtree(Path(f"./{main_tex_dir}"))
 
     return ''.join(merged_tex_lines)
